@@ -29,41 +29,41 @@ tags:
 > /**
 >  * synchronized 修饰实例方法
 >  */
->    public synchronized void increase(){
->        i++;
->    }
+>    public synchronized void increase(){  
+>        i++;  
+>    }  
 
--修饰静态方法：static关键字
+- 修饰静态方法：static关键字
 > /**
-> * 作用于静态方法,锁是当前class对象,也就是
-> * AccountingSyncClass类对应的class对象
-> */
-> public static synchronized void increase(){
->    i++;
-> }
+> * 作用于静态方法,锁是当前class对象,也就是  
+> * AccountingSyncClass类对应的class对象  
+> */  
+> public static synchronized void increase(){  
+>    i++;  
+> }  
 > 
-> /**
-> * 非静态,访问时实例对象锁不一样不会发生互斥
-> */
-> public synchronized void increase4Obj(){
->    i++;
-> }
+> /**  
+> * 非静态,访问时实例对象锁不一样不会发生互斥  
+> */  
+> public synchronized void increase4Obj(){  
+>    i++;  
+> }  
 
--修饰代码块：为指定的对象加锁，在方法体比较大的时候，如果需要加锁的代码块只是很小的一部分，则应该采用这种方式
+- 修饰代码块：为指定的对象加锁，在方法体比较大的时候，如果需要加锁的代码块只是很小的一部分，则应该采用这种方式
 >单例模式的实现
->class Singleton{
->  private volatile Singleton instance;
->  private static Singleton getInstance(){
->    if(instance==null){
->       synchronized(Singleton.class){
->          if(instance==null){
->             instance=new Singleton();
->          }
->       }
->     }
->     return instance;
->   }
->}
+>class Singleton{  
+>  private volatile Singleton instance;  
+>  private static Singleton getInstance(){  
+>    if(instance==null){  
+>       synchronized(Singleton.class){  
+>          if(instance==null){  
+>             instance=new Singleton();  
+>          }  
+>       }  
+>     }  
+>     return instance;  
+>   }  
+>}  
 
 ## Synchronized底层实现原理
 > 在Java虚拟机中Synchronized关键字的实现是通过进入和退出Monitor对象实现的，无论是显示(有明确的monitorenter和monitorexit指令)还是隐式同步都是如此;需要注意的是，当synchronized修饰方法时，是由方法调用指令读取运行常量池中的ACC_SYNCHRONIZED标志隐式实现的;
@@ -77,46 +77,46 @@ tags:
 
 -对于Synchronized来说，它是一个重量级锁，它的指针10指针指向一个monitor对象的起始地址，每个对象都有一个Monitor对象与它对应;
 -在虚拟机中对象与monitor之间的实现由多种方式；monitor可以与对象一起创建销毁或当线程试图获取对象锁时自动生成，但当一个 monitor 被某个线程持有后，它便处于锁定状态。在Java虚拟机(HotSpot)中，monitor是由ObjectMonitor实现的，其主要数据结构如下（位于HotSpot虚拟机源码ObjectMonitor.hpp文件，C++实现的）
-    ObjectMonitor() {
-    _header       = NULL;
-    _count        = 0; //记录个数
-    _waiters      = 0,
-    _recursions   = 0;
-    _object       = NULL;
-    _owner        = NULL;
-    _WaitSet      = NULL; //处于wait状态的线程，会被加入到_WaitSet
-    _WaitSetLock  = 0 ;
-    _Responsible  = NULL ;
-    _succ         = NULL ;
-    _cxq          = NULL ;
-    FreeNext      = NULL ;
-    _EntryList    = NULL ; //处于等待锁block状态的线程，会被加入到该列表
-    _SpinFreq     = 0 ;
-    _SpinClock    = 0 ;
-    OwnerIsThread = 0 ;
-  }
+    ObjectMonitor() {  
+    _header       = NULL;  
+    _count        = 0; //记录个数  
+    _waiters      = 0,  
+    _recursions   = 0;  
+    _object       = NULL;  
+    _owner        = NULL;  
+    _WaitSet      = NULL; //处于wait状态的线程，会被加入到_WaitSet  
+    _WaitSetLock  = 0 ;  
+    _Responsible  = NULL ;  
+    _succ         = NULL ;  
+    _cxq          = NULL ;  
+    FreeNext      = NULL ;  
+    _EntryList    = NULL ; //处于等待锁block状态的线程，会被加入到该列表  
+    _SpinFreq     = 0 ;  
+    _SpinClock    = 0 ;  
+    OwnerIsThread = 0 ;  
+  }  
 - ObjectMonitor中有两个队列，_WaitSet 和 _EntryList，用来保存ObjectWaiter对象列表( 每个等待锁的线程都会被封装成ObjectWaiter对象)，_owner指向持有ObjectMonitor对象的线程，当多个线程同时访问一段同步代码时，首先会进入 _EntryList 集合，当线程获取到对象的monitor 后进入 _Owner 区域并把monitor中的owner变量设置为当前线程同时monitor中的计数器count加1，若线程调用 wait() 方法，将释放当前持有的monitor，owner变量恢复为null，count自减1，同时该线程进入 WaitSe t集合中等待被唤醒。若当前线程执行完毕也将释放monitor(锁)并复位变量的值，以便其他线程进入获取monitor(锁)。
 ![](https://i.imgur.com/89E4wOW.png)
 
-## Synchronized代码块底层原理
-- 通过一段代码的反编译来理解
-     public static void increase() {
-		synchronized (SyncTest.class) {
-			i++;
-		}
-	}
-反编译的结果如下：
-![](https://i.imgur.com/XNultME.png)
+## Synchronized代码块底层原理  
+- 通过一段代码的反编译来理解  
+     public static void increase() {  
+		synchronized (SyncTest.class) {  
+			i++;  
+		}  
+	}  
+反编译的结果如下：  
+![](https://i.imgur.com/XNultME.png)  
 从图中我们可以看出，在进入代码块和出代码块时分别有monitorenter和monitorexit修饰，当执行monitorenter时，当前线程会尝试获取object对应的monitor对象的持有权，如果object的monitor的进入计数器为0，则线程可以成功进入monitor，并将计数器设置为1，取锁成功。如果当前线程已经拥有 objectref 的 monitor 的持有权，那它可以重入这个 monitor (关于重入性稍后会分析)，重入时计数器的值也会加 1。倘若其他线程已经拥有 objectref 的 monitor 的所有权，那当前线程将被阻塞，直到正在执行线程执行完毕，即monitorexit指令被执行，执行线程将释放 monitor(锁)并设置计数器值为0 ，其他线程将有机会持有 monitor 。值得注意的是编译器将会确保无论方法通过何种方式完成，方法中调用过的每条 monitorenter 指令都有执行其对应 monitorexit 指令，而无论这个方法是正常结束还是异常结束。为了保证在方法异常完成时 monitorenter 和 monitorexit 指令依然可以正确配对执行，编译器会自动产生一个异常处理器，这个异常处理器声明可处理所有的异常，它的目的就是用来执行 monitorexit 指令。从字节码中也可以看出多了一个monitorexit指令，它就是异常结束时被执行的释放monitor 的指令。
 
-## Synchronized方法实现原理
-- 通过一段代码学习
-    public static int i=0;
-	public  static synchronized void increase() {
-		i++;
-	}
-- 反编译的结果如下：
-![](https://i.imgur.com/xQpDoog.png)
+## Synchronized方法实现原理  
+- 通过一段代码学习  
+    public static int i=0;  
+	public  static synchronized void increase() {  
+		i++;  
+	}  
+- 反编译的结果如下：  
+![](https://i.imgur.com/xQpDoog.png)   
 - 从图中我们可以看出synchronized修饰方法是通过方法调用指令读取常量池中的ACC_SYCHRONIZED标记实现的，该标识指明了该方法是一个同步方法，JVM通过该ACC_SYNCHRONIZED访问标志来辨别一个方法是否声明为同步方法，从而执行相应的同步调用。这便是synchronized锁在同步代码块和同步方法上实现的基本原理。
 
 ## Synchronized和ReentrantLock的比较：
