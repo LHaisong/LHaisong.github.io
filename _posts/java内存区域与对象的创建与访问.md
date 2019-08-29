@@ -1,4 +1,4 @@
-
+---
 layout:     post
 title:      java内存区域与对象的创建与访问
 subtitle:   java内存区域、对象创建访问
@@ -7,7 +7,8 @@ author:     LHaisong
 header-img: img/post-bg-re-vs-ng2.jpg
 catalog: true
 tags:
-    -- jvm
+    - jvm
+---
     
 ## java内存区域
 
