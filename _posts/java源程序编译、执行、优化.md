@@ -1,4 +1,4 @@
- ---
+---
 layout:     post
 title:      java源程序编译、执行、优化.md
 subtitle:   编译、运行
@@ -8,7 +8,7 @@ header-img: img/post-bg-re-vs-ng2.jpg
 catalog: true
 tags:
     - jvm
- ---
+---
  
 # 源程序的编译
 
